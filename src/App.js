@@ -9,15 +9,19 @@ class App extends React.Component {
             displayMemory: [],
             operationResult: 0,
             equalHasBeenClicked: false,
+            digitLimitTimeout: 0,
         };
         this.handleNumberButton = this.handleNumberButton.bind(this);
         this.handleClearMemory = this.handleClearMemory.bind(this);
         this.handleOperators = this.handleOperators.bind(this);
         this.handleDecimal = this.handleDecimal.bind(this);
         this.makeCalculation = this.makeCalculation.bind(this);
+        this.handleDigitLimit = this.handleDigitLimit.bind(this);
+        this.handleClearDigitLimit = this.handleClearDigitLimit.bind(this);
     }
 
     handleClearMemory(e) {
+        this.handleClearDigitLimit();
         if (!e) {
             this.setState({ displayMemory: [], display: "" });
             return;
@@ -27,6 +31,8 @@ class App extends React.Component {
     }
 
     handleOperators(e) {
+        this.handleClearDigitLimit();
+
         let clickedButton = e.target;
         if (e.target.tagName === "SPAN") {
             clickedButton = e.target.closest("button");
@@ -62,11 +68,9 @@ class App extends React.Component {
                 /(-)$/.test(state.displayMemory.join("")) &&
                 /(\+|\*|\/)/.test(clickedOperator)
             ) {
-                newDisplayMemoryArray.pop();
-                newDisplayMemoryArray.push(clickedOperator);
+                newDisplayMemoryArray.splice(-1, 1, clickedOperator);
             } else if (/(\+|\*|\/)$/.test(state.displayMemory.join(""))) {
-                newDisplayMemoryArray.pop();
-                newDisplayMemoryArray.push(clickedOperator);
+                newDisplayMemoryArray.splice(-1, 1, clickedOperator);
             } else {
                 newDisplayMemoryArray.push(clickedOperator);
             }
@@ -92,6 +96,8 @@ class App extends React.Component {
             this.setState({ equalHasBeenClicked: false });
         }
 
+        if (this.handleDigitLimit()) return;
+
         this.setState((state, props) => {
             return {
                 displayMemory: state.displayMemory.concat(clickedButton.value),
@@ -100,8 +106,41 @@ class App extends React.Component {
         });
     }
 
+    handleDigitLimit() {
+        const display = document.querySelector("#display");
+        const displayContent = display.querySelector("span");
+
+        if (
+            displayContent.offsetWidth >= display.offsetWidth - 30 ||
+            displayContent.classList.contains("limit")
+        ) {
+            displayContent.textContent = "Digit Limit Met";
+            displayContent.classList.add("limit");
+
+            clearTimeout(this.state.digitLimitTimeout);
+
+            const timeoutID = setTimeout(() => {
+                displayContent.textContent = this.state.display;
+            }, 1500);
+
+            this.setState({ digitLimitTimeout: timeoutID });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    handleClearDigitLimit() {
+        const displayContent = document.querySelector("#display span");
+        displayContent.classList.remove("limit");
+    }
+
     handleDecimal(e) {
         e.target.classList.add("clicked");
+
+        if (this.handleDigitLimit()) return;
+
         this.setState((state, props) => {
             const hasDecimalDot = state.display.includes(".");
             if (!hasDecimalDot) {
@@ -115,6 +154,7 @@ class App extends React.Component {
 
     makeCalculation(e) {
         e.target.classList.add("clicked");
+        // eslint-disable-next-line no-eval
         const mathResult = eval(
             "'use strict';" + this.state.displayMemory.join("")
         );
@@ -276,7 +316,9 @@ class AppDisplay extends React.Component {
                 <div className="memory">
                     <span>{this.props.toDisplay.join("")}</span>
                 </div>
-                <div id="display">{this.props.display || 0}</div>
+                <div id="display">
+                    <span>{this.props.display || 0}</span>
+                </div>
             </div>
         );
     }

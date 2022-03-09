@@ -34,6 +34,14 @@
 #display {
     flex-basis: 100%;
     text-align: end;
+    text-transform: uppercase;
+}
+.memory span {
+    word-break: break-all;
+}
+
+#display span {
+    font-size: 1.8rem;
 }
 
 .button {
