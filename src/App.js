@@ -18,6 +18,7 @@ class App extends React.Component {
         this.makeCalculation = this.makeCalculation.bind(this);
         this.handleDigitLimit = this.handleDigitLimit.bind(this);
         this.handleClearDigitLimit = this.handleClearDigitLimit.bind(this);
+        this.handleDeleteItem = this.handleDeleteItem.bind(this);
     }
 
     handleClearMemory(e) {
@@ -168,6 +169,24 @@ class App extends React.Component {
         }));
     }
 
+    handleDeleteItem() {
+        if (this.state.equalHasBeenClicked) {
+            this.handleClearMemory();
+            return;
+        }
+        this.setState((state, props) => {
+            let newDisplayMemory = state.displayMemory;
+            let newDisplay = state.display.split("");
+            newDisplayMemory.pop();
+            newDisplay.pop();
+
+            return {
+                displayMemory: newDisplayMemory,
+                display: newDisplay.join(""),
+            };
+        });
+    }
+
     render() {
         return (
             <div style={{ margin: "0 auto", textAlign: "center" }}>
@@ -180,6 +199,11 @@ class App extends React.Component {
                         key-value="AC"
                         id="clear"
                         button-function={this.handleClearMemory}
+                    />
+                    <AppButton
+                        key-value="Back"
+                        id="delete"
+                        button-function={this.handleDeleteItem}
                     />
                     <AppButton
                         key-value="/"
