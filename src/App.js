@@ -19,23 +19,29 @@ class App extends React.Component {
         this.handleDigitLimit = this.handleDigitLimit.bind(this);
         this.handleClearDigitLimit = this.handleClearDigitLimit.bind(this);
         this.handleDeleteItem = this.handleDeleteItem.bind(this);
+        this.handleKeyboard = this.handleKeyboard.bind(this);
     }
 
-    handleClearMemory(e) {
+    // Methods
+    handleClearMemory(e = false) {
         this.handleClearDigitLimit();
-        if (!e) {
-            this.setState({ displayMemory: [], display: "" });
-            return;
+
+        let clearBtn = e.target || document.querySelector("button[value='AC']");
+        if (clearBtn.tagName === "SPAN") {
+            clearBtn = e.target.closest("button");
         }
-        e.target.classList.add("clicked");
+        clearBtn.classList.add("clicked");
+
         this.setState({ displayMemory: [], display: "" });
     }
 
     handleOperators(e) {
         this.handleClearDigitLimit();
 
-        let clickedButton = e.target;
-        if (e.target.tagName === "SPAN") {
+        let clickedButton =
+            e.target ||
+            document.querySelector(`button[value='${e.replace(/\*/i, "X")}']`);
+        if (clickedButton.tagName === "SPAN") {
             clickedButton = e.target.closest("button");
         }
 
@@ -84,8 +90,10 @@ class App extends React.Component {
     }
 
     handleNumberButton(e) {
-        let clickedButton = e.target;
-        if (e.target.tagName === "SPAN") {
+        let clickedButton =
+            e.target || document.querySelector(`button[value='${e}']`);
+
+        if (clickedButton.tagName === "SPAN") {
             clickedButton = e.target.closest("button");
         }
         clickedButton.classList.add("clicked");
@@ -137,8 +145,10 @@ class App extends React.Component {
         displayContent.classList.remove("limit");
     }
 
-    handleDecimal(e) {
-        e.target.classList.add("clicked");
+    handleDecimal(e = false) {
+        let decimalBtn =
+            e.target || document.querySelector("button[value='.']");
+        decimalBtn.classList.add("clicked");
 
         if (this.handleDigitLimit()) return;
 
@@ -146,15 +156,20 @@ class App extends React.Component {
             const hasDecimalDot = state.display.includes(".");
             if (!hasDecimalDot) {
                 return {
-                    displayMemory: state.displayMemory.concat(e.target.value),
-                    display: state.display.concat(e.target.value),
+                    displayMemory: state.displayMemory.concat(decimalBtn.value),
+                    display: state.display.concat(decimalBtn.value),
                 };
             }
         });
     }
 
-    makeCalculation(e) {
-        e.target.classList.add("clicked");
+    makeCalculation(e = false) {
+        let equalBtn = e.target || document.querySelector("button[value='=']");
+        if (equalBtn.tagName === "SPAN") {
+            equalBtn = e.target.closest("button");
+        }
+        equalBtn.classList.add("clicked");
+
         // eslint-disable-next-line no-eval
         const mathResult = eval(
             "'use strict';" + this.state.displayMemory.join("")
@@ -169,11 +184,19 @@ class App extends React.Component {
         }));
     }
 
-    handleDeleteItem() {
+    handleDeleteItem(e = false) {
+        let deleteBtn =
+            e.target || document.querySelector("button[value='Back']");
+        if (deleteBtn.tagName === "SPAN") {
+            deleteBtn = e.target.closest("button");
+        }
+        deleteBtn.classList.add("clicked");
+
         if (this.state.equalHasBeenClicked) {
             this.handleClearMemory();
             return;
         }
+
         this.setState((state, props) => {
             let newDisplayMemory = state.displayMemory;
             let newDisplay = state.display.split("");
@@ -186,6 +209,33 @@ class App extends React.Component {
             };
         });
     }
+
+    handleKeyboard(event) {
+        const clickedKey = event.key;
+
+        if (/\d/i.test(clickedKey)) this.handleNumberButton(clickedKey);
+
+        if (/\./i.test(clickedKey)) this.handleDecimal();
+
+        if (/(\+|-|\*|\/)/.test(clickedKey)) this.handleOperators(clickedKey);
+
+        if (/enter/i.test(clickedKey)) this.makeCalculation();
+
+        if (/backspace/i.test(clickedKey)) this.handleDeleteItem();
+
+        if (/escape/i.test(clickedKey)) this.handleClearMemory();
+    }
+    /* ******************* */
+
+    // Lifecycles
+    componentDidMount() {
+        window.addEventListener("keydown", this.handleKeyboard);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.handleKeyboard);
+    }
+    /* ******************* */
 
     render() {
         return (
