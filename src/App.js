@@ -23,15 +23,16 @@ class App extends React.Component {
     }
 
     // Methods
-    handleClearMemory(e = false) {
+    handleClearMemory(e = false, pressBtn = true) {
         this.handleClearDigitLimit();
-
-        let clearBtn = e.target || document.querySelector("button[value='AC']");
-        if (clearBtn.tagName === "SPAN") {
-            clearBtn = e.target.closest("button");
+        if (pressBtn) {
+            let clearBtn =
+                e.target || document.querySelector("button[value='AC']");
+            if (clearBtn.tagName === "SPAN") {
+                clearBtn = e.target.closest("button");
+            }
+            clearBtn.classList.add("clicked");
         }
-        clearBtn.classList.add("clicked");
-
         this.setState({ displayMemory: [], display: "" });
     }
 
@@ -101,7 +102,7 @@ class App extends React.Component {
         if (clickedButton.value === "0" && this.state.display === "") return;
 
         if (this.state.equalHasBeenClicked) {
-            this.handleClearMemory();
+            this.handleClearMemory(false, false);
             this.setState({ equalHasBeenClicked: false });
         }
 
@@ -193,7 +194,7 @@ class App extends React.Component {
         deleteBtn.classList.add("clicked");
 
         if (this.state.equalHasBeenClicked) {
-            this.handleClearMemory();
+            this.handleClearMemory(false, false);
             return;
         }
 
