@@ -99,7 +99,12 @@ class App extends React.Component {
         }
         clickedButton.classList.add("clicked");
 
-        if (clickedButton.value === "0" && this.state.display === "") return;
+        if (
+            clickedButton.value === "0" &&
+            (this.state.display === "" ||
+                /(\+|-|\*|\/)/.test(this.state.display[0]))
+        )
+            return;
 
         if (this.state.equalHasBeenClicked) {
             this.handleClearMemory(false, false);
