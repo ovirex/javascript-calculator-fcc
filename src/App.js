@@ -179,7 +179,7 @@ class App extends React.Component {
         this.setState((state, props) => ({
             displayMemory: state.displayMemory.concat("=" + mathResult),
             operationResult: mathResult,
-            display: mathResult,
+            display: "" + mathResult,
             equalHasBeenClicked: true,
         }));
     }
