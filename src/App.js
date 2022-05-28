@@ -363,6 +363,7 @@ class App extends React.Component {
                         href="https://ovidio.welikeperas.com"
                         target="_blank"
                         rel="noreferrer"
+                        style={{ color: "#fff" }}
                     >
                         Ovidio Pérez
                     </a>
