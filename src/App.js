@@ -20,6 +20,7 @@ class App extends React.Component {
         this.handleClearDigitLimit = this.handleClearDigitLimit.bind(this);
         this.handleDeleteItem = this.handleDeleteItem.bind(this);
         this.handleKeyboard = this.handleKeyboard.bind(this);
+        this.handleCalculation = this.handleCalculation.bind(this);
     }
 
     // Methods
@@ -177,17 +178,156 @@ class App extends React.Component {
         equalBtn.classList.add("clicked");
 
         // eslint-disable-next-line no-eval
-        const mathResult = eval(
-            "'use strict';" + this.state.displayMemory.join("")
-        );
+        console.log({ eval: this.state.displayMemory.join("") });
+        // const mathResult = eval(
+        //     "'use strict';" + this.state.displayMemory.join("")
+        // );
+        const toEvaluate = this.state.displayMemory;
+        let mathResult = 0;
+        if (this.state.equalHasBeenClicked) {
+            toEvaluate.pop();
+            mathResult = this.handleCalculation(toEvaluate);
+        } else {
+            mathResult = this.handleCalculation(toEvaluate);
+        }
+        // console.log(mathResult);
 
-        console.log(mathResult);
+        // this.handleCalculation(this.state.displayMemory);
+
         this.setState((state, props) => ({
             displayMemory: state.displayMemory.concat("=" + mathResult),
             operationResult: mathResult,
             display: "" + mathResult,
             equalHasBeenClicked: true,
         }));
+    }
+
+    handleCalculation(operationArray) {
+        let operation = operationArray;
+        let counter = 0;
+        let currentOperator = "";
+        let nextOperator = "";
+        let a = "";
+        let b = "";
+        let acumOperationResult = 0;
+        // Search for the multiplications/divisions
+        const regex = /(\d+\.\d+|\d*)(\*|\/)-?(\d+\.\d+|\d*)/;
+
+        let result = 0;
+
+        if (
+            !regex.test(operation.join("")) &&
+            /\d+|^-\d+/.test(operation.join(""))
+        ) {
+            result = +operation.join("");
+        }
+        while (regex.test(operation.join(""))) {
+            let operationString = operation.join("");
+            const factors = operationString.match(regex);
+            const [toResolve] = factors;
+            const operationSymbol = factors[2];
+
+            const factor1 = toResolve.match(/\d+/)[0];
+            const factor2 = toResolve.match(/-?((\d+\.)|\d)+$/m)[0];
+            switch (operationSymbol) {
+                case "*":
+                    result = +factor1 * +factor2;
+                    break;
+                case "/":
+                    result = +factor1 / +factor2;
+                    break;
+
+                default:
+                    break;
+            }
+            operationString = operationString.replace(regex, result.toString());
+            operation = operationString.split("");
+        }
+
+        do {
+            if (
+                !/(\+|-|\*|\/)/.test(operation.join("")) ||
+                /^-\d+/.test(operation.join(""))
+            ) {
+                acumOperationResult = result;
+                break;
+            }
+
+            let forStart = counter;
+
+            for (let i = forStart; i < operation.length; i++) {
+                counter++;
+                if (currentOperator && a.length > 0) {
+                    if (isAOperator(operation[i])) {
+                        /* Check if the operator means that the number is negative 
+                        or if it is the nextOperator */
+                        if (b.length > 0) {
+                            nextOperator = operation[i];
+                        } else {
+                            const temp = b.split("");
+                            temp.push(operation[i]);
+                            b = temp.join("");
+                        }
+                    } else {
+                        const temp = b.split("");
+                        temp.push(operation[i]);
+                        b = temp.join("");
+                    }
+                } else {
+                    if (isAOperator(operation[i])) {
+                        currentOperator = operation[i];
+                    } else {
+                        const temp = a.split("");
+                        temp.push(operation[i]);
+                        a = temp.join("");
+                    }
+                }
+
+                if (currentOperator && nextOperator && a && b) break;
+            }
+            switch (currentOperator) {
+                case "+":
+                    acumOperationResult = +a + +b;
+                    a = "" + acumOperationResult;
+                    b = "";
+                    currentOperator = nextOperator;
+                    nextOperator = "";
+                    break;
+                case "-":
+                    acumOperationResult = +a - +b;
+                    a = "" + acumOperationResult;
+                    b = "";
+                    currentOperator = nextOperator;
+                    nextOperator = "";
+                    break;
+                case "*":
+                    acumOperationResult = +a * +b;
+                    a = "" + acumOperationResult;
+                    b = "";
+                    currentOperator = nextOperator;
+                    nextOperator = "";
+                    break;
+                case "/":
+                    acumOperationResult = +a / +b;
+                    a = "" + acumOperationResult;
+                    b = "";
+                    currentOperator = nextOperator;
+                    nextOperator = "";
+                    break;
+
+                default:
+                    break;
+            }
+        } while (operation.length > counter);
+
+        console.log(acumOperationResult);
+        return acumOperationResult;
+
+        function isAOperator(element) {
+            if (/\d/i.test(element)) return false;
+
+            if (/(\+|-|\*|\/)/.test(element)) return true;
+        }
     }
 
     handleDeleteItem(e = false) {
