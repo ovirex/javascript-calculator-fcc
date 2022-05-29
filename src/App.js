@@ -213,7 +213,8 @@ class App extends React.Component {
         let b = "";
         let acumOperationResult = 0;
         // Search for the multiplications/divisions
-        const regex = /(\d+\.\d+|\d*)(\*|\/)-?(\d+\.\d+|\d*)/;
+        const regex =
+            /(-\d+\.?\d+|\d+\.\d+|\d+)(\*|\/)(\d+\.\d+|-\d+\.?\d+|-?\d+)/;
 
         let result = 0;
 
@@ -226,11 +227,9 @@ class App extends React.Component {
         while (regex.test(operation.join(""))) {
             let operationString = operation.join("");
             const factors = operationString.match(regex);
-            const [toResolve] = factors;
-            const operationSymbol = factors[2];
 
-            const factor1 = toResolve.match(/\d+/)[0];
-            const factor2 = toResolve.match(/-?((\d+\.)|\d)+$/m)[0];
+            const [, factor1, operationSymbol, factor2] = factors;
+
             switch (operationSymbol) {
                 case "*":
                     result = +factor1 * +factor2;
