@@ -184,6 +184,17 @@ class App extends React.Component {
         this.setState((state, props) => {
             const hasDecimalDot = state.display.includes(".");
             if (!hasDecimalDot) {
+                if (
+                    state.display === "" ||
+                    /^(\+|-|\*|\/)(?!\d)/.test(this.state.display)
+                ) {
+                    return {
+                        displayMemory: state.displayMemory.concat(
+                            "0" + decimalBtn.value
+                        ),
+                        display: state.display.concat("0" + decimalBtn.value),
+                    };
+                }
                 return {
                     displayMemory: state.displayMemory.concat(decimalBtn.value),
                     display: state.display.concat(decimalBtn.value),
