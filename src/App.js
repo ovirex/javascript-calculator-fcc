@@ -116,6 +116,26 @@ class App extends React.Component {
 
         if (this.handleDigitLimit()) return;
 
+        if (
+            (this.state.display[0] === "0" &&
+                !this.state.display.includes(".") &&
+                clickedButton.value !== "0") ||
+            (/(\+|-|\*|\/)0/.test(this.state.display) &&
+                !this.state.display.includes("."))
+        ) {
+            this.setState((state, props) => ({
+                display: state.display.replace("0", clickedButton.value),
+            }));
+            this.setState((state, props) => {
+                const replace = state.displayMemory;
+                replace.pop();
+                replace.push(clickedButton.value);
+                return {
+                    displayMemory: replace,
+                };
+            });
+            return;
+        }
         this.setState((state, props) => {
             return {
                 displayMemory: state.displayMemory.concat(clickedButton.value),
