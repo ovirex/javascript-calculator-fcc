@@ -391,6 +391,24 @@ class App extends React.Component {
                 display: newDisplay.join(""),
             };
         });
+
+        this.setState((state, props) => {
+            const reversedDM = [...state.displayMemory].reverse();
+            const newDisplay = [];
+            for (let i = 0; i < reversedDM.length; i++) {
+                if (/(\+|-|\*|\/)/i.test(reversedDM[i])) {
+                    newDisplay.unshift(reversedDM[i]);
+                    break;
+                } else {
+                    newDisplay.unshift(reversedDM[i]);
+                }
+            }
+            if (state.display === "") {
+                return {
+                    display: newDisplay.join(""),
+                };
+            }
+        });
     }
 
     handleKeyboard(event) {
