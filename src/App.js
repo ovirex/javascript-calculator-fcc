@@ -199,9 +199,10 @@ class App extends React.Component {
                     /^(\+|-|\*|\/)(?!\d)/.test(this.state.display)
                 ) {
                     return {
-                        displayMemory: state.displayMemory.concat(
-                            "0" + decimalBtn.value
-                        ),
+                        displayMemory: state.displayMemory.concat([
+                            "0",
+                            decimalBtn.value,
+                        ]),
                         display: state.display.concat("0" + decimalBtn.value),
                     };
                 }
