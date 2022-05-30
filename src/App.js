@@ -212,9 +212,7 @@ class App extends React.Component {
 
         // eslint-disable-next-line no-eval
         console.log({ eval: this.state.displayMemory.join("") });
-        // const mathResult = eval(
-        //     "'use strict';" + this.state.displayMemory.join("")
-        // );
+
         const toEvaluate = this.state.displayMemory;
         let mathResult = 0;
         if (this.state.equalHasBeenClicked) {
@@ -223,9 +221,6 @@ class App extends React.Component {
         } else {
             mathResult = this.handleCalculation(toEvaluate);
         }
-        // console.log(mathResult);
-
-        // this.handleCalculation(this.state.displayMemory);
 
         this.setState((state, props) => ({
             displayMemory: state.displayMemory.concat("=" + mathResult),
