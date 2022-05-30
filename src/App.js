@@ -61,6 +61,16 @@ class App extends React.Component {
         }
 
         this.setState((state, props) => {
+            if (state.displayMemory[state.displayMemory.length - 1] === ".") {
+                const newDisMem = state.displayMemory;
+                newDisMem.pop();
+                return {
+                    displayMemory: newDisMem,
+                };
+            }
+        });
+
+        this.setState((state, props) => {
             const newDisplayMemoryArray = [...state.displayMemory];
             if (/(\+|-|\*|\/){2}?$/.test(state.displayMemory.join(""))) {
                 newDisplayMemoryArray.splice(
